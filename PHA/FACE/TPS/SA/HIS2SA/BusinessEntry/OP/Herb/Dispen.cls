@@ -67,14 +67,8 @@ Method Registrations() As %ListOfObjects
 Method GetBizData(ctx As PHA.COM.BaseBizPush.Engine.Context.PushContext) As %DynamicObject
 {
         Set data = {}
-        // Set prescNo     = ctx.BizInfo.prescNo
-        // 优先使用 BizInfo 统一约定 data.no，兼容历史字段 prescNo
         Set info = ctx.GetBizInfo()
         Set prescNo = ##class(PHA.COM.BaseBizPush.Engine.Context.PushBizContextDTO).GetNo(info)
-        if prescNo = "" {
-            Set prescNo = info.prescNo
-        }
-        
         s data = ##class(PHA.FACE.TPS.SA.HIS2SA.Data.Herb).GetPrescBatchData(prescNo)
         Quit data
 }
@@ -89,9 +83,7 @@ ClassMethod TestBizPush()
 #;	s ctx.BizInfo = {}
 #;	s ctx.BizInfo.dispenseId = "123"
 #;	s ctx.BizInfo.prescNo = "O251202000004"
-	s info = {}
-	s info.dispenseId = "93"
-	s info.prescNo = "O260401000025"
+	s info = {"data":{"id":"93","no":"O260401000025"}}
 	d ctx.SetBizInfo(info)
 	
 	s tpl = ##class(PHA.FACE.TPS.SA.HIS2SA.BusinessEntry.OP.Herb.Dispen).%New()
@@ -113,7 +105,7 @@ ClassMethod Push()
     s contextData.hospId = ##class(PHA.COM.Err).GetSessionVal("LOGON.HOSPID",hospId)
     s contextData.deptId = ctloc
     s contextData.entryCode = "OP_HERB_DISPEN"
-    s contextData.bizInfo = {"phbd":(phbd),"prescNo":(prescNo)}
+    s contextData.bizInfo = {"data":{"id":(phbd),"no":(prescNo)}}
     q ##class(PHA.COM.BaseBizPush.Business.App.PushService).Push(contextData)
 }
 }

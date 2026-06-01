@@ -41,23 +41,24 @@ Method GetData() As %DynamicObject
 /// 归一化业务主信息：规范结构 data.id/data.no + 兼容历史字段
 ClassMethod NormalizeInfo(info As %DynamicObject) As %DynamicObject
 {
-    set o = ..EnsureObject(info)
+    set source = ..EnsureObject(info)
+    set o = {}
 
-    if 'o.%IsDefined("data") || '$isobject(o.data) {
-        set o.data = {}
-    }
-    if 'o.%IsDefined("ext") || '$isobject(o.ext) {
-        set o.ext = {}
+    if source.%IsDefined("type"), source.%Get("type")'="" {
+        do o.%Set("type", source.%Get("type"))
+    } ElseIf source.%IsDefined("bizType"), source.%Get("bizType")'="" {
+        do o.%Set("type", source.%Get("bizType"))
     }
 
-    set dataObj = ..EnsureObject($select(o.%IsDefined("data"):o.%Get("data"),1:{}))
+    set dataObj = ..EnsureObject($select(source.%IsDefined("data"):source.%Get("data"),1:{}))
     if ..Read(dataObj, "id", "") = "" {
-        do dataObj.%Set("id", ..PickFirst(o, "id,rowId,phd,dspId,refundId,phdReturn"))
+        do dataObj.%Set("id", ..PickFirst(source, "id,Id,rowId,rowID,phd,dspId,refundId,phdReturn"))
     }
     if ..Read(dataObj, "no", "") = "" {
-        do dataObj.%Set("no", ..PickFirst(o, "no,prescNo,billNo"))
+        do dataObj.%Set("no", ..PickFirst(source, "no,No,prescNo,billNo"))
     }
     do o.%Set("data", dataObj)
+    do o.%Set("ext", ..EnsureObject($select(source.%IsDefined("ext"):source.%Get("ext"),1:{})))
 
     quit o
 }

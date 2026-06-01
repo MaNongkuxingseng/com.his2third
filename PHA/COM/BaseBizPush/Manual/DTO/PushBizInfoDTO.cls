@@ -1,35 +1,24 @@
 // Generated from PHABizPush.xml
-// Source export timestamp: 2026-04-29 16:59:43
 
-/// 人工重推业务主信息 DTO（收敛常见主键）
-/// Author: Valen MPF
+/// Manual retry biz info DTO.
 Class PHA.COM.BaseBizPush.Manual.DTO.PushBizInfoDTO Extends %SerialObject
 {
-/// 通用主键ID（推荐）
 Property Id As %String;
 
-/// 通用业务单号（推荐）
 Property No As %String;
 
-/// 历史兼容字段：发药单号
 Property Phd As %String;
 
-/// 历史兼容字段：退费单号
 Property RefundId As %String;
 
-/// 历史兼容字段：住院发药ID
 Property DspId As %String;
 
-/// 历史兼容字段：退药单号
 Property PhdReturn As %String;
 
-/// 历史兼容字段：处方号
 Property PrescNo As %String;
 
-/// 历史兼容字段：业务单号
 Property BillNo As %String;
 
-/// 扩展字段（受控扩展入口）
 Property Ext As %DynamicObject;
 
 Method %OnNew() As %Status
@@ -40,7 +29,6 @@ Method %OnNew() As %Status
     quit $$$OK
 }
 
-/// 转为引擎可用 DynamicObject
 Method ToDynamicObject() As %DynamicObject
 {
     set o = {
@@ -48,14 +36,6 @@ Method ToDynamicObject() As %DynamicObject
             "id": (..Id),
             "no": (..No)
         },
-        "id": (..Id),
-        "no": (..No),
-        "phd": (..Phd),
-        "refundId": (..RefundId),
-        "dspId": (..DspId),
-        "phdReturn": (..PhdReturn),
-        "prescNo": (..PrescNo),
-        "billNo": (..BillNo),
         "ext": {}
     }
 
@@ -66,19 +46,16 @@ Method ToDynamicObject() As %DynamicObject
     quit o
 }
 
-/// 由 DynamicObject 反序列化为 DTO
 ClassMethod FromDynamicObject(dyn As %DynamicObject) As PHA.COM.BaseBizPush.Manual.DTO.PushBizInfoDTO
 {
     set dto = ..%New()
     if '$isobject(dyn) quit dto
 
-    // data 优先
     if dyn.%IsDefined("data") && $isobject(dyn.data) {
         set dto.Id = $get(dyn.data.id)
         set dto.No = $get(dyn.data.no)
     }
 
-    // 顶层回填
     if dto.Id="" set dto.Id = $get(dyn.id)
     if dto.No="" set dto.No = $get(dyn.no)
 
@@ -88,6 +65,9 @@ ClassMethod FromDynamicObject(dyn As %DynamicObject) As PHA.COM.BaseBizPush.Manu
     set dto.PhdReturn = $get(dyn.phdReturn)
     set dto.PrescNo = $get(dyn.prescNo)
     set dto.BillNo = $get(dyn.billNo)
+
+    if dto.Id="" set dto.Id = $select(dto.Phd'="":dto.Phd,dto.DspId'="":dto.DspId,dto.RefundId'="":dto.RefundId,dto.PhdReturn'="":dto.PhdReturn,1:"")
+    if dto.No="" set dto.No = $select(dto.PrescNo'="":dto.PrescNo,dto.BillNo'="":dto.BillNo,1:"")
 
     if dyn.%IsDefined("ext") && $isobject(dyn.ext) {
         set dto.Ext = dyn.ext
@@ -111,25 +91,25 @@ Storage Default
 <Value>No</Value>
 </Value>
 <Value name="3">
-<Value>Phd</Value>
+<Value>Ext</Value>
 </Value>
 <Value name="4">
-<Value>RefundId</Value>
+<Value>Phd</Value>
 </Value>
 <Value name="5">
-<Value>DspId</Value>
+<Value>RefundId</Value>
 </Value>
 <Value name="6">
-<Value>PhdReturn</Value>
+<Value>DspId</Value>
 </Value>
 <Value name="7">
-<Value>PrescNo</Value>
+<Value>PhdReturn</Value>
 </Value>
 <Value name="8">
-<Value>BillNo</Value>
+<Value>PrescNo</Value>
 </Value>
 <Value name="9">
-<Value>Ext</Value>
+<Value>BillNo</Value>
 </Value>
 </Data>
 }

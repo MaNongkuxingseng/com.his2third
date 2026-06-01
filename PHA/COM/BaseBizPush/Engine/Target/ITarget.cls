@@ -38,10 +38,6 @@ Method CheckDataFilter(bizData As %DynamicObject) As %Boolean
 
 Method BuildPayload(bizData As %DynamicObject, ctx As PHA.COM.BaseBizPush.Engine.Context.PushContext) As %Stream.Object [ Abstract ];
 
-/// 已经使用了PHA.COM.BaseBizPush.Engine.Platform.Adapter.PlatformAdapter对象来作平台处理
-/// 此处仅提供基本的##class(platformclass).platformmethod(code = "", streamdata) 方式的调用
-Method GetInvoke() As PHA.COM.BaseBizPush.Engine.Platform.PlatformInvoke;
-
 Method ParseResponse(rawResp) As %DynamicObject [ Abstract ];
 
 Method IsSuccess(parsedResp As %DynamicObject) As %Boolean [ Abstract ];

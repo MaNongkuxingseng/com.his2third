@@ -45,10 +45,8 @@ Method BuildPayloadByJSON(bizData As %DynamicObject, ctx As PHA.COM.BaseBizPush.
 {
     Set arr = []
     
-    // 从上下文获取退药单号
-    //Set phdReturn = $Get(ctx.BizInfo.phdReturn)
     Set info = ctx.GetBizInfo()
-    Set phdReturn = info.phdReturn
+    Set phdReturn = ##class(PHA.COM.BaseBizPush.Engine.Context.PushBizContextDTO).GetId(info)
     
     // 如果bizData已经是正确格式，直接使用；否则重新获取
     If '$IsObject(bizData.data) {
@@ -200,17 +198,6 @@ Method BuildReturnDTO(batchBizData As %DynamicObject) As PHA.FACE.TPS.SA.HIS2SA.
     }
     
     Quit dto
-}
-
-Method GetInvoke() As PHA.COM.BaseBizPush.Engine.Platform.PlatformInvoke
-{
-    Set inv = ##class(PHA.COM.BaseBizPush.Engine.Platform.PlatformInvoke).%New()
-    Set inv.PlatformName = "SA 退药同步接口"
-    Set inv.PlatformClass = "web.DHCENS.STBLL.SOAP.PUB0005Soap"
-    Set inv.MethodName = "HIPMessageInfo"
-    Set inv.NeedCode = 1
-    
-    Quit inv
 }
 
 Method ParseResponse(rawResp As %String) As %DynamicObject
@@ -414,8 +401,7 @@ ClassMethod TestBuildPayload(retId="") As %String
     Set ctx = ##class(PHA.COM.BaseBizPush.Engine.Context.PushContext).%New()
 #;    Set ctx.BizInfo = {}
 #;    Set ctx.BizInfo.phdReturn = "101"
-    Set info = {}
-    Set info.phdReturn = "101"
+    Set info = {"data":{"id":"101"}}
     Do ctx.SetBizInfo(info)
     
     // 构建Payload

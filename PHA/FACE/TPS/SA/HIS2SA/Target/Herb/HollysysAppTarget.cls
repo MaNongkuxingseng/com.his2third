@@ -77,7 +77,7 @@ Method CustomFilter(bizData As %DynamicObject, ctx As PHA.COM.BaseBizPush.Engine
 ///   xmlStr（符合接口文档的 <Prescriberecord> XML）
 Method BuildPayload(bizData As %DynamicObject, ctx As PHA.COM.BaseBizPush.Engine.Context.PushContext) As %Stream.Object
 {
-	Set prescNo = ctx.GetBizInfo().data.no
+	Set prescNo = ##class(PHA.COM.BaseBizPush.Engine.Context.PushBizContextDTO).GetNo(ctx.GetBizInfo())
 	/// 获取处方的按品种发药数据
 	Set bizData = ##class(PHA.FACE.TPS.SA.HIS2SA.Data.Herb).GetPrescData(prescNo)
 
@@ -220,23 +220,6 @@ Method BuildPayload(bizData As %DynamicObject, ctx As PHA.COM.BaseBizPush.Engine
     // -----------------------------
     // w root.ToXML()
     Quit root.ToXMLStream()
-}
-
-/// 平台调用定义
-Method GetInvoke() As PHA.COM.BaseBizPush.Engine.Platform.PlatformInvoke
-{
-        Set inv = ##class(PHA.COM.BaseBizPush.Engine.Platform.PlatformInvoke).%New()
-#;        Set inv.PlatformName  = "Hollysys SOAP"
-#;        Set inv.PlatformClass = "PHA.FACE.TPS.SA.HIS2SA.Target.Herb.HollysysAppTarget"
-#;        Set inv.MethodName    = "TestPlatForm"
-#;        Set inv.NeedCode      = 1
-#;        Quit inv
-        
-        Set inv.PlatformName  = "Hollysys SOAP"
-        Set inv.PlatformClass = "web.DHCENS.STBLL.SOAP.PUB0002Soap"
-        Set inv.MethodName    = "HIPMessageInfo"
-        Set inv.NeedCode      = 1
-        Quit inv
 }
 
 /// 解析平台返回结果

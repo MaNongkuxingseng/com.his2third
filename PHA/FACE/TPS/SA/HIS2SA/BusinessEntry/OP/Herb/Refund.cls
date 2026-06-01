@@ -56,13 +56,8 @@ Method Registrations() As %ListOfObjects
 /// 获取业务数据
 Method GetBizData(ctx As PHA.COM.BaseBizPush.Engine.Context.PushContext) As %DynamicObject
 {
-    // Set refundId = ctx.BizInfo.refundId
-    // 优先使用 BizInfo 统一约定 data.id，兼容历史字段 refundId
     Set info = ctx.GetBizInfo()
     Set refundId = ##class(PHA.COM.BaseBizPush.Engine.Context.PushBizContextDTO).GetId(info)
-    if refundId = "" {
-        Set refundId = $Get(info.refundId)
-    }
     Set data = ##class(PHA.FACE.TPS.SA.HIS2SA.Data.Herb).GetRefundData(refundId)
     Quit data
 }
@@ -78,9 +73,7 @@ ClassMethod TestRefundPush() As %String
 #;    Set ctx.BizInfo = {}
 #;    Set ctx.BizInfo.refundId = "31"
 #;    Set ctx.BizInfo.prescNo = "O251202000004"
-    Set info = {}
-    Set info.Id = "31"
-    Set info.No = "O251202000004"
+    Set info = {"data":{"id":"31","no":"O251202000004"}}
     Do ctx.SetBizInfo(info)
     
     Set tpl = ##class(PHA.FACE.TPS.SA.HIS2SA.BusinessEntry.OP.Herb.Refund).%New()
@@ -94,7 +87,7 @@ ClassMethod TestRefundPush() As %String
 ClassMethod TestRefundTarget()
 {
 	w ##class(PHA.COM.BaseBizPush.Test.TargetTester).TestTargetByClass(
-	"PHA.FACE.TPS.SA.HIS2SA.Target.Herb.HerbRefundTarget","OP_HERB_REFUND","SC001","PHA1",{"refundId":"33"},0,
+	"PHA.FACE.TPS.SA.HIS2SA.Target.Herb.HerbRefundTarget","OP_HERB_REFUND","SC001","PHA1",{"data":{"id":"33"}},0,
 	"MES0030","web.DHCENS.STBLL.SOAP.PUB0005Soap","HIPMessageInfo")
 }
 }

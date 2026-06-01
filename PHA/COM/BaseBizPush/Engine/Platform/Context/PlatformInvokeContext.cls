@@ -32,7 +32,9 @@ Property IsSuccess As %Boolean;
 /// SA.PlatformCode中定义了:PlatformClass_MethodName对应的平台适配器类
 Method getPlatformAdapter() As %String
 {
-	q ##class(PHA.COM.BaseBizPush.Engine.Platform.Adapter.DictionaryPlatformAdapterResolver).Resolve($this)
+	s adapterClass = ##class(PHA.COM.BaseBizPush.Engine.Platform.Adapter.DictionaryPlatformAdapterResolver).Resolve($this)
+	q:adapterClass'="" adapterClass
+	q "PHA.COM.BaseBizPush.Engine.Platform.Adapter.DefaultPlatformAdapter"
 }
 
 Method GetPlatformInfo() As %String
@@ -51,6 +53,10 @@ Method GetPlatformInfo() As %String
 /// 获取当前平台的简要信息
 Method GetDisplay() As %String
 {
-        q ..GetPlatformInfo()_"["_..PlatformClass_"->"_..MethodName_"("_..PlatformData.%ToJSON()_")]"
+        s platformData = "{}"
+        if $isobject(..PlatformData) {
+            s platformData = ..PlatformData.%ToJSON()
+        }
+        q ..GetPlatformInfo()_"["_..PlatformClass_"->"_..MethodName_"("_platformData_")]"
 }
 }

@@ -43,7 +43,7 @@ ClassMethod Execute(entry As PHA.COM.BaseBizPush.Business.BaseBizPushTemplate, c
                     Continue:ctx.AllowedTargetClasses.%Get(treg.TargetClass)'=1
                 }
 
-                Set sc = ..ValidatePlatformRegistration(treg, target)
+                Set sc = ..ValidatePlatformRegistration(treg)
                 If $$$ISERR(sc) {
                     Do ..AddAndLog(summary, ##class(PHA.COM.BaseBizPush.Engine.Execute.ResultFactory).BuildStatusError(entry, ctx, treg, $SYSTEM.Status.GetErrorText(sc)), ctx)
                     Continue
@@ -79,12 +79,7 @@ ClassMethod ExecuteOne(entry As PHA.COM.BaseBizPush.Business.BaseBizPushTemplate
 {
     Set result = ##class(PHA.COM.BaseBizPush.Engine.Execute.ResultFactory).BuildTargetBase(entry, target, ctx)
 
-    If pctx.getPlatformAdapter()'="" {
-        Set result.PlatformInfo = pctx.GetDisplay()
-    } Else {
-        Set invoke = target.GetInvoke()
-        Set result.PlatformInfo = invoke.GetDisplay()
-    }
+    Set result.PlatformInfo = pctx.GetDisplay()
 
     Set result.Success = 1
     Do ..WriteLog(result, ctx)
@@ -140,27 +135,22 @@ ClassMethod ExecuteSync(target As PHA.COM.BaseBizPush.Engine.Target.ITarget, pct
     }
 }
 
-ClassMethod ValidatePlatformRegistration(treg As PHA.COM.BaseBizPush.Engine.Template.TargetRegistration, target As PHA.COM.BaseBizPush.Engine.Target.ITarget) As %Status
+ClassMethod ValidatePlatformRegistration(treg As PHA.COM.BaseBizPush.Engine.Template.TargetRegistration) As %Status
 {
     Set sc = treg.ValidatePlatformRegistration()
     Quit:$$$ISERR(sc) sc
 
-    If $IsObject(target) {
-        Set adapterClass = ""
-        Try {
-            Set pctx = ##class(PHA.COM.BaseBizPush.Engine.Platform.Context.PlatformInvokeContext).%New()
-            Set pctx.PlatformClass = treg.PlatformClass
-            Set pctx.MethodName = treg.MethodName
-            Set adapterClass = pctx.getPlatformAdapter()
-        } Catch ignore {
-        }
-        If adapterClass="" {
-            Set platform = target.GetInvoke()
-            If $IsObject(platform) {
-                Set sc = platform.ValidatePlatformRegistration()
-            }
-        }
+    Try {
+        Set pctx = ##class(PHA.COM.BaseBizPush.Engine.Platform.Context.PlatformInvokeContext).%New()
+        Set pctx.PlatformCode = treg.PlatformCode
+        Set pctx.PlatformClass = treg.PlatformClass
+        Set pctx.MethodName = treg.MethodName
+        Set pctx.PlatformData = treg.PlatformData
+        Set adapterClass = pctx.getPlatformAdapter()
+    } Catch ex {
+        Quit ex.AsStatus()
     }
+    Quit:adapterClass="" $$$ERROR($$$GeneralError, "Platform adapter cannot be resolved")
 
     Quit sc
 }

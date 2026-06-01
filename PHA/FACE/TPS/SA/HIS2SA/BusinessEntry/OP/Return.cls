@@ -49,9 +49,8 @@ Method Registrations() As %ListOfObjects
 
 Method GetBizData(ctx As PHA.COM.BaseBizPush.Engine.Context.PushContext) As %DynamicObject
 {
-    // Set phdReturn = $Get(ctx.BizInfo.phdReturn)
     Set info = ctx.GetBizInfo()
-    Set phdReturn = info.phdReturn
+    Set phdReturn = ##class(PHA.COM.BaseBizPush.Engine.Context.PushBizContextDTO).GetId(info)
     Quit ##class(PHA.FACE.TPS.SA.HIS2SA.Data.OPReturn).GetPrescReturnDetail(phdReturn)
 }
 
@@ -64,8 +63,7 @@ Method TestBizPush() As %String
 
 #;    Set ctx.BizInfo = {}
 #;    Set ctx.BizInfo.phdReturn = 101   // 退药单号
-    Set info = {}
-    Set info.phdReturn = 101   // 退药单号
+    Set info = {"data":{"id":101}}
     Do ctx.SetBizInfo(info)
 
     Set entry = ##class(PHA.FACE.TPS.SA.HIS2SA.BusinessEntry.OP.Return).%New()
@@ -83,7 +81,7 @@ ClassMethod TestBizDataPush()
 	s contextData.deptId = ctloc
     s contextData.hospId = ##class(PHA.COM.Err).GetSessionVal("LOGON.HOSPID",##class(PHA.COM.Data.Base).HospIdByLoc(contextData.deptId))
     s contextData.entryCode = "OP_RETURN"
-    s contextData.bizInfo = {"phdReturn":(retrow),"prescNo":(prescNo)}
+    s contextData.bizInfo = {"data":{"id":(retrow),"no":(prescNo)}}
     s contextStr = contextData.%ToJSON()
     w ##class(PHA.COM.BaseBizPush.Business.App.PushService).Push(contextStr).%ToJSON()
     q 0

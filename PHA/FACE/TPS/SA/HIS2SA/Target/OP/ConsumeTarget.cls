@@ -42,10 +42,6 @@ Method BuildPayload(bizData As %DynamicObject, ctx As PHA.COM.BaseBizPush.Engine
 
 Method BuildPayloadByJSON(bizData As %DynamicObject, ctx As PHA.COM.BaseBizPush.Engine.Context.PushContext) As %Stream.Object
 {
-    // 从上下文获取发药单号
-    Set info = ctx.GetBizInfo()
-    Set phd = $Get(info.phd)
-    
     // 转换业务数据为平台需要的格式
     Set json = {}
     
@@ -102,17 +98,6 @@ Method BuildPayloadByJSON(bizData As %DynamicObject, ctx As PHA.COM.BaseBizPush.
     Do json.%ToJSON(.stream)
     
     Quit stream
-}
-
-Method GetInvoke() As PHA.COM.BaseBizPush.Engine.Platform.PlatformInvoke
-{
-    Set inv = ##class(PHA.COM.BaseBizPush.Engine.Platform.PlatformInvoke).%New()
-    Set inv.PlatformName = "SA 消耗同步接口"
-    Set inv.PlatformClass = "web.DHCENS.STBLL.SOAP.PUB0005Soap"
-    Set inv.MethodName = "HIPMessageInfo"
-    Set inv.NeedCode = 1  // 需要传入平台消息码
-    
-    Quit inv
 }
 
 Method ParseResponse(rawResp As %String) As %DynamicObject
@@ -283,8 +268,7 @@ ClassMethod TestBuildPayload() As %String
     Set ctx = ##class(PHA.COM.BaseBizPush.Engine.Context.PushContext).%New()
 #;    Set ctx.BizInfo = {}
 #;    Set ctx.BizInfo.phd = "281"
-	Set info = {}
-    Set info.phd = "281"
+	Set info = {"data":{"id":"281"}}
     Do ctx.SetBizInfo(info)
     
     // 构建Payload

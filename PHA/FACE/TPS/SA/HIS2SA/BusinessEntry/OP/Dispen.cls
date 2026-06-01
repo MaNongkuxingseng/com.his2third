@@ -55,16 +55,11 @@ Method Registrations() As %ListOfObjects
 }
 
 /// 获取业务数据
-/// ctx.GetBizInfo().phd = 发药单号
+/// ctx.GetBizInfo().data.id = 发药单号
 Method GetBizData(ctx As PHA.COM.BaseBizPush.Engine.Context.PushContext) As %DynamicObject
 {
-    //Set phd = $Get(ctx.BizInfo.phd)
-    // 优先使用 BizInfo 统一约定 data.id，兼容历史字段 phd
     Set info = ctx.GetBizInfo()
     Set phd = ##class(PHA.COM.BaseBizPush.Engine.Context.PushBizContextDTO).GetId(info)
-    if phd = "" {
-        Set phd = info.%Get(phd)
-    }
     Quit ##class(PHA.FACE.TPS.SA.HIS2SA.Data.OPDispen).GetPrescDispDetail(phd)
 }
 
@@ -77,7 +72,7 @@ ClassMethod TestBizPush()
     s contextData.hospId = ##class(PHA.COM.Err).GetSessionVal("LOGON.HOSPID","2")
     s contextData.deptId = ##class(PHA.OP.COM.Method).GetPrescRecLoc(prescNo)
     s contextData.entryCode = "OP_DISPEN"
-    s contextData.bizInfo = {"phd":(123),"prescNo":(prescNo)}
+    s contextData.bizInfo = {"data":{"id":123,"no":(prescNo)}}
     q ##class(PHA.COM.BaseBizPush.Business.App.PushService).Push(contextData).%ToJSON()
 }
 
@@ -88,7 +83,7 @@ ClassMethod tt()
     s contextData.deptId = $p(##class(PHA.OP.COM.Method).GetPrescRecLoc(prescNo),"^",2)
     s contextData.hospId = ##class(PHA.COM.Err).GetSessionVal("LOGON.HOSPID",##class(PHA.COM.Data.Base).HospIdByLoc(contextData.deptId))
     s contextData.entryCode = "OP_DISPEN"
-    s contextData.bizInfo = {"phd":(281),"prescNo":(prescNo)}
+    s contextData.bizInfo = {"data":{"id":281,"no":(prescNo)}}
     set ret = ##class(PHA.COM.BaseBizPush.Business.App.PushService).Push(contextData)
     q ret.%ToJSON()
 	
@@ -100,7 +95,7 @@ ClassMethod tt()
 #;    Set ctx.BizInfo = {}
 #;    Set ctx.BizInfo.phd = 281   // 发药单号
     Set info = {}
-    Set info.phd = 286   // 发药单号
+    Set info = {"data":{"id":286}}
     Do ctx.SetBizInfo(info)
 
     Set entry = ##class(PHA.FACE.TPS.SA.HIS2SA.BusinessEntry.OP.Dispen).%New()

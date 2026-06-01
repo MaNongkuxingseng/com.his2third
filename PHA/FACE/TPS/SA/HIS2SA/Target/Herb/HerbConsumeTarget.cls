@@ -40,16 +40,6 @@ Method BuildPayload(bizData As %DynamicObject, ctx As PHA.COM.BaseBizPush.Engine
 	Quit stream
 }
 
-Method GetInvoke() As PHA.COM.BaseBizPush.Engine.Platform.PlatformInvoke
-{
-    Set inv = ##class(PHA.COM.BaseBizPush.Engine.Platform.PlatformInvoke).%New()
-    Set inv.PlatformName  = "SA 消耗接口"
-    Set inv.PlatformClass = "web.SA.HerbConsume.Service"
-    Set inv.MethodName    = "PushConsume"
-    Set inv.NeedCode      = 1
-    Quit inv
-}
-
 Method ParseResponse(rawResp As %String) As %DynamicObject
 {
     Set result = {}
@@ -75,21 +65,4 @@ Method BuildResultMessage(parsedResp As %DynamicObject) As %String
     Quit $Get(parsedResp.raw, "无返回信息")
 }
 
-/// w ##class(PHA.FACE.TPS.SA.HIS2SA.Target.Herb.HerbConsumeTarget).Tesst()
-ClassMethod Tesst()
-{
-	s ht = ##class(PHA.FACE.TPS.SA.HIS2SA.Target.Herb.HerbConsumeTarget).%New()
-	s dispData = ht.BuildPayload({},{"BizInfo":{"prescNo":"O251202000011"}})
-	q dispData.Read()
-}
-
-/// w ##class(PHA.FACE.TPS.SA.HIS2SA.Target.Herb.HerbConsumeTarget).Tesst1()
-ClassMethod Tesst1()
-{
-	
-	set Stream="{""FIDNo"":""O251202000011"",""FBillTypeID"":""发药"",""FDate"":""2025-12-02 18:14:37"",""FSaleOrgId"":""昆明-人民中路馆"",""FSaleDeptID"":""ZYYX005"",""FCustomerID"":""0000000001"",""Order"":""1308||45"",""FMaterialID"":""YPC000109"",""FMaterialIDdesc"":""防风[饮片]"",""FUnitID"":"""",""FRealQty"":""14"",""FTaxPrice"":"".21759"",""FEntryTaxRate"":"""",""ypssje"":3.04626,""Ypph"":""202304200002"",""Batid"":""202304200002""},{""FIDNo"":""O251202000011"",""FBillTypeID"":""发药"",""FDate"":""2025-12-02 18:14:37"",""FSaleOrgId"":""昆明-人民中路馆"",""FSaleDeptID"":""ZYYX005"",""FCustomerID"":""0000000001"",""Order"":""1308||44"",""FMaterialID"":""YPC000122"",""FMaterialIDdesc"":""甘草[饮片]"",""FUnitID"":"""",""FRealQty"":""14"",""FTaxPrice"":"".0575"",""FEntryTaxRate"":"""",""ypssje"":0.805,""Ypph"":""202304200002"",""Batid"":""202304200002""}"
-	set soap=##class(web.DHCENS.STBLL.SOAP.PUB0005Soap).%New()
-    set rtn=soap.HIPMessageInfo("MES0029",Stream,"02","HD1005")	//每条都单独调用
-	quit rtn
-}
 }

@@ -55,7 +55,7 @@ Method Registrations() As %ListOfObjects
 Method GetBizData(ctx As PHA.COM.BaseBizPush.Engine.Context.PushContext) As %DynamicObject
 {
     Set info = ctx.GetBizInfo()
-    Set dspId = info.%Get(dspId)
+    Set dspId = ##class(PHA.COM.BaseBizPush.Engine.Context.PushBizContextDTO).GetId(info)
     Quit ##class(PHA.FACE.TPS.SA.HIS2SA.Data.IPDispense).GetDispenseDetail(dspId)
 }
 
@@ -71,8 +71,7 @@ ClassMethod TestBizPush()
 
 #;    Set ctx.BizInfo = {}
 #;    Set ctx.BizInfo.dspId = 201
-    Set info = {}
-    Set info.dspId = 201
+    Set info = {"data":{"id":201}}
     Do ctx.SetBizInfo(info)
 
     Set entry = ##class(PHA.FACE.TPS.SA.HIS2SA.BusinessEntry.IP.Dispense).%New()

@@ -42,16 +42,6 @@ Method BuildPayload(bizData As %DynamicObject, ctx As PHA.COM.BaseBizPush.Engine
     Quit stream
 }
 
-Method GetInvoke() As PHA.COM.BaseBizPush.Engine.Platform.PlatformInvoke
-{
-    Set inv = ##class(PHA.COM.BaseBizPush.Engine.Platform.PlatformInvoke).%New()
-    Set inv.PlatformName = "SA 退药消耗接口"
-    Set inv.PlatformClass = "web.SA.HerbRefund.Service"
-    Set inv.MethodName = "PushRefund"
-    Set inv.NeedCode = 1
-    Quit inv
-}
-
 Method ParseResponse(rawResp As %String) As %DynamicObject
 {
     Set result = {}
