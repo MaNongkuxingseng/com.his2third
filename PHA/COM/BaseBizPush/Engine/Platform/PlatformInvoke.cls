@@ -16,10 +16,11 @@ Property NeedCode As %Boolean [ InitialExpression = 0 ];
 
 Method Invoke(code As %String="", stream As %Stream.Object="") As %DynamicObject
 {
+		s platform = $classmethod(..PlatformClass,"%New")
         if (..NeedCode) {
-	        q $classmethod(..PlatformClass, ..MethodName, code, stream)
+	        q $method(platform, ..MethodName, code, stream)
         }
-        q $classmethod(..PlatformClass, ..MethodName, stream)
+        q $method(platform, ..MethodName, stream)
 }
 
 Method InvokeByMethod(code As %String="", stream As %Stream.Object="") As %DynamicObject
