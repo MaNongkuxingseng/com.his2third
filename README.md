@@ -33,6 +33,7 @@ PHA/
 
 - [工程结构](docs/工程结构.md)
 - [开发规范](docs/开发规范.md)
+- [架构优化实施说明](docs/架构优化实施说明.md)
 - [Git流程](docs/Git流程.md)
 - [ObjectScript导入说明](docs/ObjectScript导入说明.md)
 
