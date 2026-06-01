@@ -114,13 +114,14 @@ ClassMethod ScanAllEntries() As %DynamicObject
     
     try {
         // 获取所有子类
-        set subclasses = ..GetAllSubclasses("PHA.COM.BaseBizPush.Engine.Template.BasePushTemplate")
+        set subclasses = ..GetAllSubclasses("PHA.COM.BaseBizPush.Business.BaseBizPushTemplate")
         
         for i = 1:1:subclasses.Count() {
             set cls = subclasses.GetAt(i)
             
             // 跳过BasePushTemplate自身
             if cls = "PHA.COM.BaseBizPush.Engine.Template.BasePushTemplate" continue
+            if cls = "PHA.COM.BaseBizPush.Business.BaseBizPushTemplate" continue
             
             set entry = ..SafeNewObject(cls)
             
@@ -153,12 +154,17 @@ ClassMethod ScanAllEntries() As %DynamicObject
                         set ro.targets = []
                         
                         // 收集目标类信息
-                        if $isobject(reg.TargetClasses) {
-                            for k = 1:1:reg.TargetClasses.Count() {
-                                set targetCls = reg.TargetClasses.GetAt(k)
+                        if $isobject(reg.Targets) {
+                            for k = 1:1:reg.Targets.Count() {
+                                set treg = reg.Targets.GetAt(k)
+                                continue:'$isobject(treg)
+                                set targetCls = treg.TargetClass
                                 
                                 set targetInfo = {}
                                 set targetInfo.className = targetCls
+                                set targetInfo.platformCode = treg.PlatformCode
+                                set targetInfo.platformClass = treg.PlatformClass
+                                set targetInfo.methodName = treg.MethodName
                                 
                                 set targetInst = ..SafeNewObject(targetCls)
                                 if $isobject(targetInst) {
@@ -260,10 +266,11 @@ ClassMethod SimpleTest()
                     for j = 1:1:regs.Count() {
                         set reg = regs.GetAt(j)
                         write "    院区: ", reg.HospId, ", 科室: ", reg.DeptCode, !
-                        if $isobject(reg.TargetClasses) {
+                        if $isobject(reg.Targets) {
                             write "    目标类: ", !
-                            for k = 1:1:reg.TargetClasses.Count() {
-                                write "      - ", reg.TargetClasses.GetAt(k), !
+                            for k = 1:1:reg.Targets.Count() {
+                                set treg = reg.Targets.GetAt(k)
+                                write "      - ", treg.TargetClass, !
                             }
                         }
                     }
@@ -415,10 +422,11 @@ ClassMethod FinalTestScan()
                         write "  院区: ", reg.HospId, !
                         write "  科室: ", reg.DeptCode, !
                         
-                        if $isobject(reg.TargetClasses) {
-                            write "  目标类数量: ", reg.TargetClasses.Count(), !
-                            for j = 1:1:reg.TargetClasses.Count() {
-                                set targetCls = reg.TargetClasses.GetAt(j)
+                        if $isobject(reg.Targets) {
+                            write "  目标类数量: ", reg.Targets.Count(), !
+                            for j = 1:1:reg.Targets.Count() {
+                                set treg = reg.Targets.GetAt(j)
+                                set targetCls = treg.TargetClass
                                 write "    - ", targetCls, !
                             }
                         }

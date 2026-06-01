@@ -25,9 +25,15 @@ Method GetDataFilter() As PHA.COM.BaseBizPush.Engine.Filter.IDataFilter
 }
 
 /// target自定义的数据过滤
-Method CheckDataFilte(bizData As %DynamicObject) As %Boolean [ Abstract ]
+Method CheckDataFilte(bizData As %DynamicObject) As %Boolean
 {
-	q ""
+	q 0
+}
+
+/// 拼写修正后的兼容别名，旧 CheckDataFilte 暂保留。
+Method CheckDataFilter(bizData As %DynamicObject) As %Boolean
+{
+	q ..CheckDataFilte(bizData)
 }
 
 Method BuildPayload(bizData As %DynamicObject, ctx As PHA.COM.BaseBizPush.Engine.Context.PushContext) As %Stream.Object [ Abstract ];

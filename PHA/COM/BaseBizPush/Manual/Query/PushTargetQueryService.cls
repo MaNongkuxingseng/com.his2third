@@ -18,17 +18,14 @@ ClassMethod Query(entryCode As %String, hospId As %String, deptCode As %String) 
         quit resp
     }
 
-    set entryClass = ##class(PHA.COM.BaseBizPush.Business.App.PushService).ResolveEntryClass(entryCode)
+    set entryClass = ##class(PHA.COM.BaseBizPush.Engine.Resolve.EntryResolver).Resolve(entryCode)
     if entryClass = "" {
         set resp.Message = "未找到业务入口["_entryCode_"]"
         quit resp
     }
 
-    set entry = $classmethod(entryClass, "%New")
-    set ctx = ##class(PHA.COM.BaseBizPush.Engine.Context.PushContext).%New()
-    set ctx.TriggerCode = entryCode
-    set ctx.HospId = hospId
-    set ctx.DeptCode = deptCode
+    set entry = ##class(PHA.COM.BaseBizPush.Engine.Factory.TargetFactory).NewEntry(entryClass)
+    set ctx = ##class(PHA.COM.BaseBizPush.Engine.Factory.ContextFactory).FromValues(entryCode, hospId, deptCode)
 
     set seen = {}
     set regs = entry.Registrations()
@@ -42,7 +39,8 @@ ClassMethod Query(entryCode As %String, hospId As %String, deptCode As %String) 
             continue:cls=""
             continue:seen.%Get(cls)=1
 
-            set target = $classmethod(cls, "%New")
+            set target = ##class(PHA.COM.BaseBizPush.Engine.Factory.TargetFactory).NewTarget(cls)
+            continue:'$isobject(target)
             set item = ##class(PHA.COM.BaseBizPush.Manual.DTO.PushTargetInfoDTO).%New()
             set item.TargetClass = cls
             set item.DisplayName = target.GetName()

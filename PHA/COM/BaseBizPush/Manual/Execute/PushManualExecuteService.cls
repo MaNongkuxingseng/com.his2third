@@ -21,25 +21,19 @@ ClassMethod Execute(req As PHA.COM.BaseBizPush.Manual.DTO.PushExecuteRequestDTO)
         quit resp
     }
 
-    set entryClass = ##class(PHA.COM.BaseBizPush.Business.App.PushService).ResolveEntryClass(req.EntryCode)
+    set entryClass = ##class(PHA.COM.BaseBizPush.Engine.Resolve.EntryResolver).Resolve(req.EntryCode)
     if entryClass = "" {
         set resp.Message = "未找到业务入口["_req.EntryCode_"]"
         quit resp
     }
 
-    set ctx = ##class(PHA.COM.BaseBizPush.Engine.Context.PushContext).%New()
-    set ctx.TriggerCode = req.EntryCode
-    set ctx.HospId = req.HospId
-    set ctx.DeptCode = req.DeptCode
     set bizDyn = {}
     if $isobject(req.BizInfo) {
         set bizDyn = req.BizInfo.ToDynamicObject()
     }
-    do ctx.SetBizInfo(##class(PHA.COM.BaseBizPush.Engine.Context.PushBizContextDTO).NormalizeInfo(bizDyn))
-    set ctx.TriggerMode = "MANUAL"
-    set ctx.AllowedTargetClasses = ..BuildAllowedMap(req.TargetClasses)
+    set ctx = ##class(PHA.COM.BaseBizPush.Engine.Factory.ContextFactory).FromValues(req.EntryCode, req.HospId, req.DeptCode, bizDyn, "MANUAL", req.TargetClasses)
 
-    set entry = $classmethod(entryClass, "%New")
+    set entry = ##class(PHA.COM.BaseBizPush.Engine.Factory.TargetFactory).NewEntry(entryClass)
     set summary = entry.Execute(ctx)
 
     do ..BuildItems(resp, summary, req.TargetClasses)
@@ -70,13 +64,7 @@ ClassMethod ValidateRequest(req As PHA.COM.BaseBizPush.Manual.DTO.PushExecuteReq
 
 ClassMethod BuildAllowedMap(targetClasses As %ListOfDataTypes) As %DynamicObject
 {
-    set map = {}
-    for i=1:1:targetClasses.Count() {
-        set cls = targetClasses.GetAt(i)
-        continue:cls=""
-        set map.cls = 1
-    }
-    quit map
+    quit ##class(PHA.COM.BaseBizPush.Engine.Factory.ContextFactory).BuildAllowedMap(targetClasses)
 }
 
 /// 将引擎结果封装为前端最小可用结构（一个 Target 一个结果）

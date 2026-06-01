@@ -32,12 +32,7 @@ Property IsSuccess As %Boolean;
 /// SA.PlatformCode中定义了:PlatformClass_MethodName对应的平台适配器类
 Method getPlatformAdapter() As %String
 {
-	s dicId = ""
-	s dicCode = $$ALPHAUP^SSUTIL4(..PlatformClass_"_"_..MethodName)
-	q:dicCode="" dicId
-	s dicId = $o(^DHCSTSCDI(0,"TYPECODE","SAPLATFORMCODE",dicCode,""))
-	s adapterClass = ##class(PHA.COM.Data.Base).StkComDictionaryDesc(dicId)
-	q adapterClass
+	q ##class(PHA.COM.BaseBizPush.Engine.Platform.Adapter.DictionaryPlatformAdapterResolver).Resolve($this)
 }
 
 Method GetPlatformInfo() As %String

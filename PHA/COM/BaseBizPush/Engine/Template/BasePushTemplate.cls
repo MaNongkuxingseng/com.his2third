@@ -7,6 +7,8 @@ Class PHA.COM.BaseBizPush.Engine.Template.BasePushTemplate Extends %RegisteredOb
 {
 Method Execute(ctx As PHA.COM.BaseBizPush.Engine.Context.PushContext) As PHA.COM.BaseBizPush.Engine.Result.PushSummary
 {
+        q ##class(PHA.COM.BaseBizPush.Engine.Execute.PushExecutor).Execute($this, ctx)
+
         s summary = ##class(PHA.COM.BaseBizPush.Engine.Result.PushSummary).%New()
         s regs = ..Registrations()
         s matched = 0

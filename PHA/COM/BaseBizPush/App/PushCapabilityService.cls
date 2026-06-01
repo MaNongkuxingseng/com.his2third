@@ -14,18 +14,15 @@ ClassMethod QueryAvailableTargets(entryCode As %String, hospId As %String, deptC
     s result.DeptCode = deptCode
     s result.Targets = ##class(%ListOfObjects).%New()
 
-    s ctx = ##class(PHA.COM.BaseBizPush.Engine.Context.PushContext).%New()
-    s ctx.TriggerCode = entryCode
-    s ctx.HospId = hospId
-    s ctx.DeptCode = deptCode
+    s ctx = ##class(PHA.COM.BaseBizPush.Engine.Factory.ContextFactory).FromValues(entryCode, hospId, deptCode)
 
-    s entryClass = ##class(PHA.COM.BaseBizPush.Business.App.PushService).ResolveEntryClass(entryCode)
+    s entryClass = ##class(PHA.COM.BaseBizPush.Engine.Resolve.EntryResolver).Resolve(entryCode)
     q:entryClass="" result
 
-    s entry = $classmethod(entryClass, "%New")
+    s entry = ##class(PHA.COM.BaseBizPush.Engine.Factory.TargetFactory).NewEntry(entryClass)
     s result.EntryName = entry.ActionName()
 
-    s regs = entry.Registrations()
+    s regs = ##class(PHA.COM.BaseBizPush.Engine.Registry.RegistrationReader).GetRegistrations(entry)
     for i=1:1:regs.Count() {
         s reg = regs.GetAt(i)
         i '##class(PHA.COM.BaseBizPush.Engine.Match.EntryMatcher).IsMatch(reg, ctx) {
@@ -34,7 +31,8 @@ ClassMethod QueryAvailableTargets(entryCode As %String, hospId As %String, deptC
 
         for j=1:1:reg.Targets.Count() {
             s treg = reg.Targets.GetAt(j)
-            s target = $classmethod(treg.TargetClass, "%New")
+            s target = ##class(PHA.COM.BaseBizPush.Engine.Factory.TargetFactory).NewTarget(treg.TargetClass)
+            continue:'$isobject(target)
 
             s dto = ##class(PHA.COM.BaseBizPush.DTO.PushTargetDTO).%New()
             s dto.Key = treg.TargetClass

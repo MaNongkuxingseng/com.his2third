@@ -29,7 +29,7 @@ ClassMethod Execute(entryCode As %String, hospId As %String, deptId As %String, 
     if hospId = "" {
         q ..BuildError("hospId不能为空")
     }
-    if deptCode = "" {
+    if deptId = "" {
         q ..BuildError("deptCode不能为空")
     }
 
@@ -86,9 +86,13 @@ ClassMethod Push(reqObj As %DynamicObject) As %DynamicObject
         d ..LogPushResponse(reqObj,resp)
         q resp
     }
-    if reqObj.deptId = "" {
+    s deptCode = $Get(reqObj.deptCode)
+    if deptCode = "" {
+        s deptCode = $Get(reqObj.deptId)
+    }
+    if deptCode = "" {
         //q ..BuildError("deptId不能为空")
-        s resp = ..BuildError("deptId不能为空")
+        s resp = ..BuildError("deptCode不能为空")
         d ..LogPushResponse(reqObj,resp)
         q resp
     }
@@ -108,17 +112,15 @@ ClassMethod Push(reqObj As %DynamicObject) As %DynamicObject
     // =========================
     // 3. 构造 PushContext
     // =========================
-    s ctx = ##class(PHA.COM.BaseBizPush.Engine.Context.PushContext).%New()
-    s ctx.TriggerCode = reqObj.entryCode
-    s ctx.HospId = reqObj.hospId
-    s ctx.DeptCode = reqObj.deptId
-    // s ctx.BizInfo = reqObj.bizInfo
-    d ctx.SetBizInfo(reqObj.bizInfo)		// 使用DTO规范化业务信息
+    if 'reqObj.%IsDefined("deptCode") {
+        do reqObj.%Set("deptCode", deptCode)
+    }
+    s ctx = ##class(PHA.COM.BaseBizPush.Engine.Factory.ContextFactory).FromRequest(reqObj)
 
     // =========================
     // 4. 执行业务入口
     // =========================
-    s entry = $classmethod(entryClass, "%New")
+    s entry = ##class(PHA.COM.BaseBizPush.Engine.Factory.TargetFactory).NewEntry(entryClass)
     s summary = entry.Execute(ctx)
 
     // =========================
@@ -133,33 +135,7 @@ ClassMethod Push(reqObj As %DynamicObject) As %DynamicObject
 /// w ##class(PHA.COM.BaseBizPush.Business.App.PushService).ResolveEntryClass("OP_HERB_DISPEN")
 ClassMethod ResolveEntryClass(entryCode As %String) As %String
 {
-	s cls = ""
-	s entryCode = $zconvert(entryCode, "U")
-    s rs = ##class(%ResultSet).%New("%Dictionary.ClassDefinition:SubclassOf")
-
-    // 扫描所有 BaseEntry 子类
-    d rs.Execute("PHA.COM.BaseBizPush.Business.BaseBizPushTemplate")
-	// w ##class(PHA.COM.JSONUtils).RsWriteJSON(rs)
-    while rs.Next() {
-        s clsName = rs.Get("Name")
-		s bizClass = $classmethod(clsName, "%New")
-
-        if bizClass.ActionCode() = entryCode {
-            s cls = clsName
-            quit
-        }else {
-	        k bizClass
-        }
-    }
-
-    q cls
-	
-    // 门诊草药发药后推送
-    if entryCode = "OP_HERB_DISPEN" {
-        q "PHA.COM.BaseBizPush.Business.OPHerbDispenEntry"
-    }
-
-    q ""
+	q ##class(PHA.COM.BaseBizPush.Engine.Resolve.EntryResolver).Resolve(entryCode)
 }
 
 /// ===============================

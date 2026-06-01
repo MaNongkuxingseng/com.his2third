@@ -65,4 +65,18 @@ Method GetBizData() As %DynamicObject
     }
     quit ..Biz.GetData()
 }
+
+Method ToDynamicObject() As %DynamicObject
+{
+    set obj = {}
+    set obj.triggerCode = ..TriggerCode
+    set obj.hospId = ..HospId
+    set obj.deptCode = ..DeptCode
+    set obj.triggerMode = ..TriggerMode
+    set obj.bizInfo = ..GetBizInfo()
+    if $isobject(..AllowedTargetClasses) {
+        set obj.allowedTargetClasses = ..AllowedTargetClasses
+    }
+    quit obj
+}
 }
