@@ -5,12 +5,19 @@ Class PHA.COM.BaseBizPush.Engine.Execute.AsyncDispatcher Extends %RegisteredObje
 {
 ClassMethod Dispatch(targetClass As %String, platformCode As %String, platformClass As %String, methodName As %String, platformData As %DynamicObject, bizData As %DynamicObject, ctxObj As %DynamicObject)
 {
-    Job ##class(PHA.COM.BaseBizPush.Engine.Execute.AsyncDispatcher).Run(targetClass, platformCode, platformClass, methodName, platformData, bizData, ctxObj)
+    Set platformDataJson = ..ToJSON(platformData)
+    Set bizDataJson = ..ToJSON(bizData)
+    Set ctxJson = ..ToJSON(ctxObj)
+    Job ##class(PHA.COM.BaseBizPush.Engine.Execute.AsyncDispatcher).Run(targetClass, platformCode, platformClass, methodName, platformDataJson, bizDataJson, ctxJson)
 }
 
-ClassMethod Run(targetClass As %String, platformCode As %String, platformClass As %String, methodName As %String, platformData As %DynamicObject, bizData As %DynamicObject, ctxObj As %DynamicObject)
+ClassMethod Run(targetClass As %String, platformCode As %String, platformClass As %String, methodName As %String, platformDataJson As %String, bizDataJson As %String, ctxJson As %String)
 {
     Try {
+        Set platformData = ..FromJSON(platformDataJson)
+        Set bizData = ..FromJSON(bizDataJson)
+        Set ctxObj = ..FromJSON(ctxJson)
+
         Set ctx = ##class(PHA.COM.BaseBizPush.Engine.Context.PushContext).%New()
         Set ctx.TriggerCode = ctxObj.triggerCode
         Set ctx.HospId = ctxObj.hospId
@@ -31,5 +38,24 @@ ClassMethod Run(targetClass As %String, platformCode As %String, platformClass A
     } Catch ex {
         // 异步异常不反抛，避免影响主流程。
     }
+}
+
+ClassMethod ToJSON(obj) As %String
+{
+    Quit:$IsObject(obj) obj.%ToJSON()
+    Quit "{}"
+}
+
+ClassMethod FromJSON(json As %String)
+{
+    Quit:json="" {}
+    Try {
+        If $Extract(json,1)="[" {
+            Quit ##class(%DynamicArray).%FromJSON(json)
+        }
+        Quit ##class(%DynamicObject).%FromJSON(json)
+    } Catch ex {
+    }
+    Quit {}
 }
 }
