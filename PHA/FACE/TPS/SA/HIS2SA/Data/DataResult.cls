@@ -9,7 +9,11 @@ ClassMethod Ok(data As %DynamicObject) As %DynamicObject
     Set result = {}
     Set result.success = 1
     Set result.message = "ok"
-    Set result.data = $Select($IsObject(data):data,1:{})
+    If $IsObject(data) {
+        Set result.data = data
+    } Else {
+        Set result.data = {}
+    }
     Quit result
 }
 

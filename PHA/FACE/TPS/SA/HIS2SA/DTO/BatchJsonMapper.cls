@@ -7,16 +7,31 @@ Class PHA.FACE.TPS.SA.HIS2SA.DTO.BatchJsonMapper Extends %RegisteredObject
 ClassMethod ToEnvelope(header As %DynamicObject, items As %DynamicArray) As %DynamicObject
 {
     Set obj = {}
-    Set obj.header = $Select($IsObject(header):header,1:{})
-    Set obj.items = $Select($IsObject(items):items,1:[])
+    If $IsObject(header) {
+        Set obj.header = header
+    } Else {
+        Set obj.header = {}
+    }
+    If $IsObject(items) {
+        Set obj.items = items
+    } Else {
+        Set obj.items = []
+    }
     Quit obj
 }
 
 ClassMethod ToPlatformObject(header As %DynamicObject, items As %DynamicArray, itemField As %String="Items") As %DynamicObject
 {
-    Set obj = $Select($IsObject(header):header,1:{})
+    If $IsObject(header) {
+        Set obj = header
+    } Else {
+        Set obj = {}
+    }
     Set:itemField="" itemField = "Items"
-    Do obj.%Set(itemField, $Select($IsObject(items):items,1:[]))
+    If '$IsObject(items) {
+        Set items = []
+    }
+    Do obj.%Set(itemField, items)
     Quit obj
 }
 
