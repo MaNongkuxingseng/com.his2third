@@ -7,6 +7,12 @@
 
 所有工程内变更先进入 `dev`，确认后再合并到 `main`。
 
+远程仓库：
+
+```text
+origin https://github.com/MaNongkuxingseng/com.his2third.git
+```
+
 ## 提交规范
 
 提交信息使用中文，建议格式：

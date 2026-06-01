@@ -2,11 +2,13 @@
 
 本仓库由 `PHABizPush.xml` 提取 ObjectScript 类源码生成，用于维护 HIS 到 SA 系统的数据推送能力。
 
+GitHub 仓库：[MaNongkuxingseng/com.his2third](https://github.com/MaNongkuxingseng/com.his2third.git)
+
 ## 项目来源
 
 - 源文件：`PHABizPush.xml`
 - 导出平台：InterSystems IRIS
-- 当前源码：55 个 `.cls` 类文件
+- 当前源码：76 个 `.cls` 类文件
 - 当前分支策略：`main` 保存稳定快照，`dev` 承接后续开发与文档补充
 
 ## 目录概览
