@@ -1,0 +1,30 @@
+// Generated from PHABizPush.xml
+// Source export timestamp: 2026-04-29 16:59:43
+
+/// 人工重推单目标结果 DTO
+/// Author: Valen MPF
+Class PHA.COM.BaseBizPush.Manual.DTO.PushExecuteResultItemDTO Extends %RegisteredObject
+{
+/// 前端关键字
+Property Keyword As %String;
+
+/// Target 唯一标识（类名）
+Property TargetClass As %String;
+
+/// 是否成功
+Property Success As %Boolean;
+
+/// 结果信息
+Property Message As %String;
+
+/// 转换为前端可用动态对象
+Method ToDynamicObject() As %Library.DynamicObject
+{
+    quit {
+        "keyword": (..Keyword),
+        "targetClass": (..TargetClass),
+        "success": (..Success),
+        "message": (..Message)
+    }
+}
+}
